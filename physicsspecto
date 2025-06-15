@@ -1,3 +1,4 @@
+# importing the cool stuff
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,16 +28,16 @@ def doTheThing():
             b_dist = []
             g_dist = []
             i_dist = []
-            for i in range(shape[1]):
-                b_val = np.mean(cropped[:, i][:, 0])  # Blue
-                g_val = np.mean(cropped[:, i][:, 1])  # Green
-                r_val = np.mean(cropped[:, i][:, 2])  # Red
-                i_val = (r_val + b_val + g_val) / 3  # Intensity (mean of all channels)
-
-                r_dist.append(r_val)
-                g_dist.append(g_val)
-                b_dist.append(b_val)
-                i_dist.append(i_val)
+        for i in range(shape[1]):
+            b_val = np.mean(cropped[:, i][:, 0])  # Blue
+            g_val = np.mean(cropped[:, i][:, 1])  # Green
+            r_val = np.mean(cropped[:, i][:, 2])  # Red
+            i_val = (r_val + b_val + g_val) / 3  # Intensity (mean of all channels)
+        
+            r_dist.append(r_val)
+            g_dist.append(g_val)
+            b_dist.append(b_val)
+            i_dist.append(i_val)
 
             plt.subplot(2, 1, 1)
             plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))  # Convert BGR to RGB for correct color display
@@ -64,9 +65,11 @@ def doTheThing():
                 cv2.imshow('The thing', frame)
 
     cv2.destroyAllWindows()
+# actually doing the thing
 def main():
     print("uhh dude you gotta press the button to start the thing")
-
+    
+    #waits for button to be pressed, then does the thing
     try:
         while True:
             if GPIO.input(17) == GPIO.HIGH:
