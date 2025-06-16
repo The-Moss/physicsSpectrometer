@@ -10,7 +10,7 @@ GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 def doTheThing():
     # Load the image from a file
-    image_path = "/Users/tomosr/Desktop/Screenshots/trickytowersss.png"  # Replace with the path to your image
+    image_path = "/Users/tomosr/Desktop/Screenshots/trickytowersss.png"  # Replace with the path to image
     frame = cv2.imread(image_path)
 
     if frame is None:
