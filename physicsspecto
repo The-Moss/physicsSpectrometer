@@ -8,9 +8,12 @@ import time
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+# Camera setup for Rasberry pi
+picam2 = Picamera2()
+
 def doTheThing():
     # Load the image from a file
-    image_path = "/Users/tomosr/Desktop/Screenshots/trickytowersss.png"  # Replace with the path to image
+    image_path = "/Users/tomosr/Desktop/Screenshots/spectrum.jpg"  # Replace with the path to image
     frame = cv2.imread(image_path)
 
     if frame is None:
@@ -73,6 +76,9 @@ def main():
     try:
         while True:
             if GPIO.input(17) == GPIO.HIGH:
+                picam2.start()
+                time.sleep(2)
+                picam2.capture_file("spectrum.jpg")
                 print("thaks mate, processing the image...")
                 doTheThing()
                 break
