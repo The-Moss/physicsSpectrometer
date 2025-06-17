@@ -13,7 +13,7 @@ picam2 = Picamera2()
 #red hues dont show up in the initial graph, you must scroll to the right to see them
 def doTheThing():
         # Load the image
-        rgb_image = cv2.imread('/Users/tomosr/Desktop/Screenshots/spectrumTest.webp')
+        rgb_image = cv2.imread('insert image file here')
         rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
         
         # Convert to HSV
