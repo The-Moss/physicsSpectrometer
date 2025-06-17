@@ -1,0 +1,82 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+import Rpi.GPIO as GPIO
+import time
+from picamera2 import Picamera2
+# GPIO setup for Raspberry Pi
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+# Camera setup for Rasberry pi
+picam2 = Picamera2()
+
+
+
+def doTheThing():
+        # Load and convert image
+    rgb_image = cv2.imread('/Users/tomosr/Desktop/Screenshots/SuperSecretColour.png')
+    rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+
+    # Convert to HSV and extract hue in degrees
+    hsv_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2HSV)
+    hue_channel = hsv_image[:, :, 0].astype(np.float32) * 2  # [0, 179] * 2 → [0, 358]
+
+    # Bin hue values from 0 to 270 degrees
+    valid_hues = hue_channel[(hue_channel >= 0) & (hue_channel < 270)]
+    bin_edges = np.arange(0, 271)  # 0 to 270 inclusive
+    hist, _ = np.histogram(valid_hues, bins=bin_edges)
+
+    # Map bin index to wavelength: 0 → 620nm (red), 269 → 450nm (violet)
+    wavelengths = 620 - (170 / 270) * np.arange(0, 270)
+
+    # Plot only nonzero bins
+    nonzero_indices = np.nonzero(hist)[0]
+    nonzero_counts = hist[nonzero_indices]
+    nonzero_wavelengths = wavelengths[nonzero_indices]
+    nonzero_hues = nonzero_indices  # bin index = hue in degrees
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(9, 3))
+    bars = ax.bar(nonzero_wavelengths, nonzero_counts, width=1, align='edge', edgecolor='none')
+
+    # Now: hue bin 0 = hue 0° = red → correct
+    #       hue bin 269 = hue 269° = blue/violet → correct
+    # Assign HSV colors to bars based on bin *reversed* (red = high wavelength)
+    for bar, hue_deg in zip(bars, nonzero_hues):
+        hue_for_color = hue_deg / 360  # HSV expects 0–1
+        rgb_color = plt.cm.hsv(hue_for_color)
+        bar.set_facecolor(rgb_color)
+
+    # Fix axes and background
+    ax.set_xlim(450, 620)
+    ax.set_ylim(0, 5000)  # manually set as you requested
+    ax.set_facecolor('black')
+    fig.patch.set_facecolor('black')
+    ax.set_xlabel('Wavelength (nm)', color='white')
+    ax.set_ylabel('Bin counts', color='white')
+    ax.tick_params(colors='white')
+    plt.tight_layout()
+    plt.show()
+def main():
+    print("uhh dude you gotta press the button to start the thing")
+
+    try:
+        while True:
+            if GPIO.input(17) == GPIO.HIGH:
+                picam2.start()
+                time.sleep(2)
+                picam2.capture_file("spectrum.jpg")
+                print("thaks mate, processing the image...")
+                doTheThing()
+                break
+            time.sleep(0.1)
+
+    except KeyboardInterrupt:
+        print("uh dude whyd you stop me? dafuq?")
+
+    finally:
+        GPIO.cleanup()
+
+
+if __name__ == '__main__':
+    main()
